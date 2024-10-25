@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Kenny Sadiku Blog - Edit Post</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="Kenny Sadiku Blog" name="keywords" />
+    <meta content="Kenny Sadiku Blog" name="description" />
+
+    <!-- Favicon -->
+    <link href="static/img/favicon.ico" rel="icon" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link
+      href="{{ url_for('static', path='css/style.css') }}"
+      rel="stylesheet"
+    />
+
+    <!-- SimpleMDE -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+    <style>
+      .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .spinner {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .editor-preview-side {
+        top: 50px;
+        right: 0;
+        bottom: 0;
+        width: 50%;
+        overflow: auto;
+        background: #fff;
+        z-index: 1000;
+      }
+      .editor-toolbar {
+        background-color: #f8f9fa;
+        border-radius: 0;
+      }
+      .CodeMirror {
+        height: calc(100vh - 200px);
+      }
+      .editor-statusbar {
+        padding: 8px 15px;
+        background-color: #f8f9fa;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <!-- Sidebar Start -->
+      <div class="sidebar">
+        <div class="sidebar-text d-flex flex-column h-100 justify-content-center text-center">
+          <img class="mx-auto d-block w-75 bg-primary img-fluid rounded-circle mb-4 p-3"
+            src="{{ url_for('static', path='img/profile.jpg') }}" alt="Image" />
+          <h1 class="font-weight-bold">Kenny Sadiku</h1>
+          <p class="mb-4">
+            A visionary writer with great abilities in crafting inspirational and
+            christian content
+          </p>
+          <div class="d-flex justify-content-center mb-5">
+            <a class="btn btn-outline-primary mr-2" href="#"><i class="fab fa-twitter"></i></a>
+            <a class="btn btn-outline-primary mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+            <a class="btn btn-outline-primary mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+            <a class="btn btn-outline-primary mr-2" href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="/about" class="btn btn-lg btn-block btn-primary mt-auto">About Me</a>
+        </div>
+      </div>
+      <!-- Sidebar End -->
+
+      <div class="content">
+        <!-- Navbar Start -->
+        <div class="container p-0">
+          <nav class="navbar navbar-expand-lg bg-secondary navbar-dark">
+            <div class="navbar-nav m-auto">
+              <a href="/" class="nav-item nav-link">Home</a>
+              <a href="/about" class="nav-item nav-link">About</a>
+              <a href="/blog" class="nav-item nav-link">Blog</a>
+              <a href="/contact" class="nav-item nav-link">Contact</a>
+              <a href="/dashboard" class="nav-item nav-link">Dashboard</a>
+            </div>
+          </nav>
+        </div>
+        <!-- Navbar End -->
+
+        <!-- Page Header Start -->
+        <div class="container py-5 px-2 bg-primary">
+          <div class="row py-5 px-4">
+            <div class="col-sm-6 text-center text-md-left">
+              <h1 class="mb-3 mb-md-0 text-white text-uppercase font-weight-bold">
+                Edit Blog Post
+              </h1>
+            </div>
+            <div class="col-sm-6 text-center text-md-right">
+              <div class="d-inline-flex pt-2">
+                <h4 class="m-0 text-white"><a class="text-white" href="/dashboard">Dashboard</a></h4>
+                <h4 class="m-0 text-white px-2">/</h4>
+                <h4 class="m-0 text-white">Edit Post</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Page Header End -->
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading" style="display: none">
+          <div class="spinner"></div>
+        </div>
+
+        <!-- Edit Form Start -->
+        <div class="container py-5 px-2 bg-white">
+          <div class="row px-4">
+            <div class="col-12 mb-3">
+              <input
+                type="text"
+                id="title"
+                class="form-control form-control-lg"
+                placeholder="Enter your blog title"
+                value="{{ article.title }}"
+              />
+            </div>
+            <div class="col-12 mb-3">
+              <input
+                type="text"
+                id="image"
+                class="form-control form-control-lg"
+                placeholder="Enter the image URL"
+                value="{{ article.image }}"
+              />
+            </div>
+            <div class="col-12">
+              <textarea id="editor">{{ article.body }}</textarea>
+            </div>
+          </div>
+          <div class="row px-4 mt-4">
+            <div class="col-12">
+              <button id="updateButton" class="btn btn-primary">Update Post</button>
+              <button id="saveButton" class="btn btn-secondary">Save Draft</button>
+              <a href="/dashboard" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </div>
+        </div>
+        <!-- Edit Form End -->
+
+        <!-- Footer Start -->
+        <div class="container py-4 bg-secondary text-center">
+          <p class="m-0 text-white">
+            &copy; <a class="text-white font-weight-bold" href="#">Kenny Sadiku</a>.
+            All Rights Reserved
+          </p>
+        </div>
+        <!-- Footer End -->
+      </div>
+    </div>
+
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Editor Script -->
+    <script>
+      var simplemde = new SimpleMDE({
+        element: document.getElementById("editor"),
+        spellChecker: false,
+      });
+
+      function toggleLoading(show) {
+        const loadingElement = document.getElementById("loading");
+        loadingElement.style.display = show ? "flex" : "none";
+      }
+
+      async function submitUpdate(actionType) {
+        var title = document.getElementById("title").value;
+        var image = document.getElementById("image").value;
+        var content = simplemde.value();
+
+        if (!title || !content) {
+          alert("Title and Content are required");
+          return;
+        }
+
+        try {
+          toggleLoading(true);
+          document.getElementById("updateButton").disabled = true;
+          document.getElementById("saveButton").disabled = true;
+
+          const response = await fetch("/dashboard/edit/{{ article.id }}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+              title: title,
+              image: image,
+              body: content,
+              action: actionType,
+            }),
+          });
+
+          if (response.redirected) {
+            window.location.href = response.url;
+          } else {
+            const data = await response.json();
+            console.log("Success:", data);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred while updating the post. Please try again.");
+        } finally {
+          toggleLoading(false);
+          document.getElementById("updateButton").disabled = false;
+          document.getElementById("saveButton").disabled = false;
+        }
+      }
+
+      document.getElementById("updateButton").addEventListener("click", function() {
+        submitUpdate("Publish");
+      });
+
+      document.getElementById("saveButton").addEventListener("click", function() {
+        submitUpdate("Save");
+      });
+    </script>
+  </body>
+</html>
